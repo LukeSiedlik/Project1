@@ -98,7 +98,6 @@ class VoteWindow(QMainWindow):
             self.result_label.setStyleSheet("color: green;")
             self.id_input.clear()
 
-            # Reset radio buttons using QButtonGroup
             self.button_group.setExclusive(False)
             self.john_radio.setChecked(False)
             self.jane_radio.setChecked(False)
