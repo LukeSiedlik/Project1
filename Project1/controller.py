@@ -1,3 +1,4 @@
+#Controller file
 from logic import VoteManager
 from gui import VoteWindow
 
