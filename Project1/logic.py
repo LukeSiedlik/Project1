@@ -32,39 +32,31 @@ class VoteManager:
         except Exception as e:
             print(f"Error saving votes: {e}")
 
-    def cast_vote(self, candidate: str, voter_id: str) -> tuple[bool, str]:
+    def cast_vote(self, candidate: str, voter_id: str) -> tuple[bool, str, str]:
         """
         Casts a vote for a candidate if the voter ID is valid and has not voted yet.
-
         Args:
             candidate: The candidate's name to vote for.
             voter_id: The voter's UNO ID, must be 8 digits.
-
         Returns:
-            A tuple of success status and message.
+            A tuple of success status, message, and vote summary.
         """
         if candidate not in self.votes:
-            return False, "Invalid candidate."
+            return False, "Invalid candidate.", self.update_vote_summary()
 
         if not voter_id.isdigit() or len(voter_id) != 8:
-            return False, "UNO ID must be an 8-digit number."
+            return False, "UNO ID must be an 8-digit number.", self.update_vote_summary()
 
         if self._has_voted(voter_id):
-            return False, "Already Voted"
+            return False, "Already Voted", self.update_vote_summary()
 
         self.votes[candidate] += 1
         self._save_votes()
         self._record_voter(voter_id, candidate)
-        return True, f"Thank you for voting for {candidate}!"
+        return True, f"Thank you for voting for {candidate}!", self.update_vote_summary()
 
     def _record_voter(self, voter_id: str, candidate: str) -> None:
-        """
-        Records the voter's ID and selected candidate to the voters file.
-
-        Args:
-            voter_id: The voter's UNO ID.
-            candidate: The candidate's name.
-        """
+        """Records the voter's ID and selected candidate to the voters file."""
         try:
             file_exists = False
             try:
@@ -82,13 +74,7 @@ class VoteManager:
             print(f"Error recording voter: {e}")
 
     def _has_voted(self, voter_id: str) -> bool:
-        """
-        Checks if a voter has already voted.
-        Params:
-            voter_id: The voter's UNO ID.
-        Returns:
-            True if the voter has already voted, False otherwise.
-        """
+        """Checks if a voter has already voted."""
         try:
             with open(self.voters_filename, mode='r', newline='') as file:
                 reader = csv.reader(file)
@@ -102,10 +88,25 @@ class VoteManager:
             print(f"Error checking voter: {e}")
         return False
 
+    def update_vote_summary(self) -> str:
+        """Returns the current vote summary for both candidates."""
+        summary = f"John: {self.votes['John']} votes\nJane: {self.votes['Jane']} votes"
+        return summary
+
     def get_votes(self) -> dict:
-        """
-        Returns a copy of the current vote tally.
-        Returns:
-            A dictionary of candidate names and their respective vote counts.
-        """
+        """Returns a copy of the current vote tally."""
         return self.votes.copy()
+
+    def on_vote_clicked(self, voter_id: str, candidate: str) -> tuple[bool, str, str]:
+        """Handles GUI submission and updates display based on result."""
+        if not voter_id:
+            return False, "Please enter a valid voter ID.", self.update_vote_summary()
+
+        if not voter_id.isdigit() or len(voter_id) != 8:
+            return False, "UNO ID must be an 8-digit number.", self.update_vote_summary()
+
+        if candidate not in self.votes:
+            return False, "Please select a candidate.", self.update_vote_summary()
+
+        success, message, summary = self.cast_vote(candidate, voter_id)
+        return success, message, summary
