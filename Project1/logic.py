@@ -1,3 +1,4 @@
+#LOGIC file
 import csv
 
 class VoteManager:

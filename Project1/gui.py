@@ -1,3 +1,4 @@
+#GUI file
 from PyQt6.QtWidgets import (
     QMainWindow, QLabel, QLineEdit, QPushButton,
     QRadioButton, QVBoxLayout, QHBoxLayout, QWidget, QButtonGroup
