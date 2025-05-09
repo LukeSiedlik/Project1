@@ -6,6 +6,7 @@ from PyQt6.QtCore import Qt
 
 class VoteWindow(QMainWindow):
     def __init__(self, on_vote_func) -> None:
+        """Initializes the voting window with the provided vote handler function."""
         super().__init__()
         self.result_label = None
         self.summary_label = None
@@ -19,6 +20,7 @@ class VoteWindow(QMainWindow):
         self.init_ui()
 
     def init_ui(self) -> None:
+        """Sets up the UI elements for the voting window."""
         main_layout = QVBoxLayout()
 
         instruction_label = QLabel("Enter your UNO ID and select a candidate")
@@ -58,23 +60,27 @@ class VoteWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def display_result(self, message: str, error: bool = False) -> None:
+        """Displays the result message with the appropriate styling."""
         self.result_label.setText(message)
         color = "red" if error else "green"
         self.result_label.setStyleSheet(f"color: {color};")
 
     def on_vote_clicked(self) -> None:
+        """Handles GUI submission and updates display based on result."""
         voter_id = self.id_input.text().strip()
 
-        if not (self.john_radio.isChecked() or self.jane_radio.isChecked()):
-            message = "Please Select Candidate"
-            self.display_result(message, error=True)
-            self.summary_label.setText(self.on_vote_func(voter_id, "John")[2])
+        candidate = None
+        if self.john_radio.isChecked():
+            candidate = "John"
+        elif self.jane_radio.isChecked():
+            candidate = "Jane"
+
+        if candidate is None:
+            self.display_result("Please select a candidate.", error=True)
+            self.summary_label.setText("")
             return
 
-        candidate = "John" if self.john_radio.isChecked() else "Jane"
-
         success, message, summary = self.on_vote_func(voter_id, candidate)
-
         self.display_result(message, error=not success)
         self.summary_label.setText(summary)
 
