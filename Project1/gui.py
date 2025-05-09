@@ -1,4 +1,3 @@
-#GUI file
 from PyQt6.QtWidgets import (
     QMainWindow, QLabel, QLineEdit, QPushButton,
     QRadioButton, QVBoxLayout, QHBoxLayout, QWidget, QButtonGroup
@@ -59,14 +58,19 @@ class VoteWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def display_result(self, message: str, error: bool = False) -> None:
-        """Display the result message with appropriate styling."""
         self.result_label.setText(message)
         color = "red" if error else "green"
         self.result_label.setStyleSheet(f"color: {color};")
 
     def on_vote_clicked(self) -> None:
-        """Handles GUI submission and updates display based on result."""
         voter_id = self.id_input.text().strip()
+
+        if not (self.john_radio.isChecked() or self.jane_radio.isChecked()):
+            message = "Please Select Candidate"
+            self.display_result(message, error=True)
+            self.summary_label.setText(self.on_vote_func(voter_id, "John")[2])
+            return
+
         candidate = "John" if self.john_radio.isChecked() else "Jane"
 
         success, message, summary = self.on_vote_func(voter_id, candidate)

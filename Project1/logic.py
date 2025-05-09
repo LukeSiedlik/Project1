@@ -1,4 +1,3 @@
-#LOGIC file
 import csv
 
 class VoteManager:
@@ -106,7 +105,7 @@ class VoteManager:
         if not voter_id.isdigit() or len(voter_id) != 8:
             return False, "UNO ID must be an 8-digit number.", self.update_vote_summary()
 
-        if candidate not in self.votes:
+        if candidate not in self.candidates:
             return False, "Please select a candidate.", self.update_vote_summary()
 
         success, message, summary = self.cast_vote(candidate, voter_id)
